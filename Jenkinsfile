@@ -24,9 +24,9 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo "Installing Python dependencies..."
-                sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
+                bat '''
+                    python -m venv venv
+                    call venv\Scripts\activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
                 '''
@@ -36,8 +36,8 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo "Running unit tests..."
-                sh '''
-                    . venv/bin/activate
+                bat '''
+                    call venv\Scripts\activate
                     pytest tests/ -v --tb=short
                 '''
             }
@@ -51,28 +51,28 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image: ${DOCKER_VERSIONED}"
-                sh "docker build -t ${DOCKER_VERSIONED} -t ${DOCKER_LATEST} ."
+                bat "docker build -t ${DOCKER_VERSIONED} -t ${DOCKER_LATEST} ."
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
                 echo "Pushing Docker image to Docker Hub..."
-                sh '''
-                    echo "$DOCKERHUB_CREDS_PSW" | docker login -u "$DOCKERHUB_CREDS_USR" --password-stdin
-                    docker push ''' + "${DOCKER_VERSIONED}" + '''
-                    docker push ''' + "${DOCKER_LATEST}" + '''
-                '''
+                bat """
+                    echo %DOCKERHUB_CREDS_PSW% | docker login -u %DOCKERHUB_CREDS_USR% --password-stdin
+                    docker push ${DOCKER_VERSIONED}
+                    docker push ${DOCKER_LATEST}
+                """
             }
         }
 
         stage('Cleanup') {
             steps {
                 echo "Removing local Docker images to free space..."
-                sh '''
-                    docker rmi ''' + "${DOCKER_VERSIONED}" + ''' || true
-                    docker rmi ''' + "${DOCKER_LATEST}" + ''' || true
-                '''
+                bat """
+                    docker rmi ${DOCKER_VERSIONED} || exit /b 0
+                    docker rmi ${DOCKER_LATEST} || exit /b 0
+                """
             }
         }
     }
