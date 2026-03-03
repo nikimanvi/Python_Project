@@ -25,10 +25,10 @@ pipeline {
             steps {
                 echo "Installing Python dependencies..."
                 bat '''
-                    python -m venv venv
+                    py -m venv venv
                     call venv\\Scripts\\activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
+                    py -m pip install --upgrade pip
+                    py -m pip install -r requirements.txt
                 '''
             }
         }
@@ -37,8 +37,7 @@ pipeline {
             steps {
                 echo "Running unit tests..."
                 bat '''
-                    call venv\\Scripts\\activate
-                    pytest tests/ -v --tb=short
+                    call venv\\Scripts\\activate && pytest tests/ -v --tb=short
                 '''
             }
             post {
