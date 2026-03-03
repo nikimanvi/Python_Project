@@ -86,9 +86,10 @@ pipeline {
         }
         always {
             echo "Cleaning up workspace..."
-            node {
-                cleanWs()
-            }
+            cleanWs(cleanWhenNotBuilt: false,
+                    deleteDirs: true,
+                    disableDeferredWipeout: true,
+                    notFailBuild: true)
         }
     }
 }
