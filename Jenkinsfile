@@ -9,7 +9,7 @@ pipeline {
         DOCKER_VERSIONED = "${DOCKER_IMAGE}:${DOCKER_TAG}"
 
         // Jenkins credential ID that stores Docker Hub username/password
-        DOCKERHUB_CREDS  = credentials('dockerhub-credentials')
+        DOCKERHUB_CREDS  = credentials('docker-hub-credentials')
     }
 
     stages {
@@ -59,7 +59,7 @@ pipeline {
             steps {
                 echo "Pushing Docker image to Docker Hub..."
                 sh '''
-                    echo "$DOCKERHUB_CREDS_PSW" | docker login -u "$docker-hub-credentials" --password-stdin
+                    echo "$DOCKERHUB_CREDS_PSW" | docker login -u "$DOCKERHUB_CREDS_USR" --password-stdin
                     docker push ''' + "${DOCKER_VERSIONED}" + '''
                     docker push ''' + "${DOCKER_LATEST}" + '''
                 '''
@@ -86,10 +86,8 @@ pipeline {
         }
         always {
             echo "Cleaning up workspace..."
-            script {
-                if (currentBuild.result != null) {
-                    cleanWs()
-                }
+            node {
+                cleanWs()
             }
         }
     }
