@@ -59,7 +59,7 @@ pipeline {
             steps {
                 echo "Pushing Docker image to Docker Hub..."
                 sh '''
-                    echo "$DOCKERHUB_CREDS_PSW" | docker login -u "$DOCKERHUB_CREDS_USR" --password-stdin
+                    echo "$DOCKERHUB_CREDS_PSW" | docker login -u "$docker-hub-credentials" --password-stdin
                     docker push ''' + "${DOCKER_VERSIONED}" + '''
                     docker push ''' + "${DOCKER_LATEST}" + '''
                 '''
@@ -86,7 +86,11 @@ pipeline {
         }
         always {
             echo "Cleaning up workspace..."
-            cleanWs()
+            script {
+                if (currentBuild.result != null) {
+                    cleanWs()
+                }
+            }
         }
     }
 }
