@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        // Docker Hub image name — replace with your Docker Hub username
-        DOCKER_IMAGE     = "your-dockerhub-username/flask-python-app"
+        // Docker Hub image name — set to your namespace/repo on Docker Hub
+        DOCKER_IMAGE     = "nikithamanvi/flask-python-app"
         DOCKER_TAG       = "${env.BUILD_NUMBER}"
         DOCKER_LATEST    = "${DOCKER_IMAGE}:latest"
         DOCKER_VERSIONED = "${DOCKER_IMAGE}:${DOCKER_TAG}"
